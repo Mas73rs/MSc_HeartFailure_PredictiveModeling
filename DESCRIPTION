@@ -1,0 +1,26 @@
+Package: MSc_HeartFailure_PredictiveModeling
+Type: Project
+Title: Predictive Modelling for Heart Failure
+Version: 1.0
+Author: Thierry Leutou
+Maintainer: thierry.leutou@yahoo.com
+Description: This project focuses on predictive modelling for heart failure based on patient data. 
+             Utilising R for data analysis, the project aims to identify critical variables that 
+             contribute to heart failure and develop a predictive model for clinical use. 
+             The model is validated against a test dataset and includes visualisations to interpret the results better.
+License: MIT
+Depends: 
+  R (>= 3.5.0)
+Imports: 
+	tidyr,
+	dplyr,
+	caret,
+	rpart,
+	rpart.plot
+	randomForest,
+	Boruta,
+	ROCR,
+	gbm,
+	core-lot,
+	stringr
+
