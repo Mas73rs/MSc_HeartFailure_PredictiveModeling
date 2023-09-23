@@ -1,0 +1,233 @@
+---
+title: "Heart Failure Prediction"
+author: "Your Name"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+# Introduction
+
+This is an exploratory analysis of a heart failure dataset.
+
+# Data Loading
+
+```{r}
+# Load required packages
+library(tidyverse)
+library(ggplot2)
+library(caret)
+library(GGally)
+library(dplyr)
+
+
+# Read the dataset
+data <- read.csv("data/processed/cleaned_data.csv")
+```
+
+# Data Cleaning
+
+## Convert Target Variable to Factor
+
+```{r}
+data$DEATH_EVENT <- as.factor(data$DEATH_EVENT)
+```
+
+# Data Exploration
+
+## Summary Statistics
+
+```{r}
+summary(data)
+```
+
+## Correlation Analysis
+
+```{r}
+# Select only numeric variables for correlation
+numeric_data <- data[, sapply(data, is.numeric)]
+
+# Correlation matrix
+if (ncol(numeric_data) > 1) {
+  cor_matrix <- cor(numeric_data, method = "pearson")
+  print("Correlation Matrix:")
+  print(cor_matrix)
+  
+  # Visualize correlation matrix
+  library(corrplot)
+  corrplot(cor_matrix, method = "circle")
+} else {
+  print("Not enough numeric variables for a correlation matrix.")
+}
+```
+
+## Univariate Plots
+
+### Age Distribution
+
+```{r}
+data %>%
+ggplot(aes(x = age)) + geom_histogram(binwidth = 5,
+color = "white", alpha = 0.5) +
+labs(title = "Age Distribution") + scale_x_continuous(breaks = seq(40, 100, 10))
+```
+
+### Death Event by Age
+
+```{r}
+data %>%
+ggplot(aes(x = age, fill = DEATH_EVENT)) + geom_histogram(binwidth = 5,
+color = "white", alpha = 0.7) +
+labs(title = "Death Event by Age") + scale_x_continuous(breaks = seq(40, 100, 10))
+```
+
+# Model Building
+
+## Logistic Regression
+
+
+
+
+
+```{r}
+library(dplyr)
+# Select only numeric variables for correlation
+numeric_data <- clean_data[, sapply(clean_data, is.numeric)]
+
+# Correlation matrix
+if (ncol(numeric_data) > 1) { # check if we have at least two numeric variables
+  cor_matrix <- cor(numeric_data, method = "pearson")
+  print("Correlation Matrix:")
+  print(cor_matrix)
+  
+  # Visualize correlation matrix
+  library(corrplot)
+  corrplot(cor_matrix, method = "circle")
+} else {
+  print("Not enough numeric variables for a correlation matrix.")
+}
+```
+
+
+```{r}
+
+```
+
+## Distribution of Age and Death Event
+
+```{r}
+library(ggplot2)
+
+# Age distribution
+clean_data %>%
+  ggplot(aes(x = age)) + 
+  geom_histogram(binwidth = 5, color = "white", fill = "#0c4c8a", alpha = 0.7) +
+  labs(title = "Age Distribution") + 
+  scale_x_continuous(breaks = seq(40, 100, 10))
+
+# Death event by age
+clean_data %>%
+  ggplot(aes(x = age, fill = as.factor(DEATH_EVENT))) + 
+  geom_histogram(binwidth = 5, position = "dodge", alpha = 0.7) +
+  labs(title = "Death Event by Age") +
+  scale_fill_manual(values = c("#0c4c8a", "#e63946"))
+```
+
+
+## Further Analysis
+
+### Logistic Regression
+Here you can add the code for logistic regression analysis.
+
+```{r}
+# Logistic Regression code here
+```
+
+### Tree-Based Models
+Here you can add the code for tree-based models like Decision Trees, Random Forest, etc.
+
+```{r}
+# Tree-Based Models code here
+```
+
+### Model Evaluation
+Discuss and evaluate the performance of the models here.
+
+```{r}
+# Model Evaluation code here
+```
+
+```{r}
+
+# Logistic Regression Analysis
+
+## Load required libraries
+library(tidyverse)
+library(caret)
+
+## Load the cleaned data
+clean_data <- read.csv("clean_data.csv")
+
+## Splitting the data into training and test sets
+set.seed(42)
+splitIndex <- createDataPartition(clean_data$DEATH_EVENT, p = .7, list = FALSE)
+train_data <- clean_data[splitIndex,]
+test_data  <- clean_data[-splitIndex,]
+
+## Model Fitting
+logistic_model <- glm(DEATH_EVENT ~ ., family = binomial(), data = train_data)
+
+## Summary of the model
+summary(logistic_model)
+
+## Predictions
+predictions <- predict(logistic_model, test_data, type = "response")
+
+## Evaluating the model
+roc_curve <- roc(test_data$DEATH_EVENT, predictions)
+auc(roc_curve)
+
+## Confusion Matrix
+predictions_binary <- ifelse(predictions > 0.5, 1, 0)
+conf_matrix <- confusionMatrix(as.factor(predictions_binary), as.factor(test_data$DEATH_EVENT))
+print(conf_matrix)
+
+```
+
+## Logistic Regression
+
+### Model Fitting
+We'll fit a logistic regression model using all the features in the dataset. 
+
+```{r}
+# Fit the logistic regression model
+logistic_model <- glm(DEATH_EVENT ~ ., family = binomial(), data = train_data)
+```
+
+### Model Summary
+After fitting, we can check the summary of the model to interpret the coefficients and assess the significance of each feature.
+
+```{r}
+# Display the summary of the logistic regression model
+summary(logistic_model)
+```
+
+### Model Evaluation
+We can use metrics like accuracy, confusion matrix, and ROC curve to evaluate the model.
+
+```{r}
+# Predict on the test set
+predictions <- predict(logistic_model, newdata = test_data, type = "response")
+
+# Convert probabilities to binary outcomes
+predicted_labels <- ifelse(predictions > 0.5, 1, 0)
+
+# Confusion Matrix
+cm <- confusionMatrix(as.factor(predicted_labels), as.factor(test_data$DEATH_EVENT))
+cm
+```
+
+```{r}
+# ROC Curve
+roc_curve <- roc(test_data$DEATH_EVENT, predictions)
+roc_curve
+```
