@@ -4,9 +4,9 @@ output:
   html_document: default
 ---
 
-# Setup
+# 1. Setup
 
-## Setting the environment
+## 1.1 Setting the environment
 
 ```{r Libraries, message=FALSE, warning=FALSE}
 library(tidyr)
@@ -22,33 +22,38 @@ library(corrplot)
 library(stringr)
 ```
 
-## Data Cleaning
+# 2. Data Cleaning
+
+## 2.1 Data preprocessing
 
 ```{r N/A drop}
 # Source to the preprocessing script
 source("Rscripts/data_preprocessing.R")
 ```
 
+## 2.2 Checking for duplicates
 ```{r Duplicates}
-# Checking for duplicates
 sum(duplicated(clean_data))
 ```
 
+## 2.3 Convert Target Variable to Factor
 ```{r Death_event to factor}
-# Converting DEATH_EVENT into a factor
 clean_data$DEATH_EVENT <- factor(clean_data$DEATH_EVENT)
 ```
 
-## Data exploration
+# 3. Data Exploration
+
+## 3.1 Data Structure
 ```{r Data structure}
-# Data exploration
 glimpse(clean_data)
 ```
 
+## 3.2 Summary Statistics
 ```{r Data summary}
 summary(clean_data)
 ```
 
+## 3.3 Correlation Analysis
 ```{r}
 # Select only numeric variables for correlation
 numeric_data <- clean_data[, sapply(clean_data, is.numeric)]
@@ -77,6 +82,9 @@ clean_data %>%
 
 ```
 
+## 3.4 Univariate Plots
+
+### Age Distribution
 
 ```{r Exploration}
 # Age distribution Plots
@@ -86,11 +94,15 @@ clean_data %>%
   ggplot(aes(x = age)) + 
   geom_histogram(binwidth = 5, 
                  color = "white", 
-                 fill = "grey",
                  alpha = 0.5) +
   labs(title = "Age Distribution") +
   scale_x_continuous(breaks = seq(40,100,10))
 
+```
+
+### Death Event by Age
+
+```{r}
 # Age distribution against Death Event
 clean_data %>% 
   ggplot(aes(x = age, fill = DEATH_EVENT)) +
@@ -101,14 +113,7 @@ clean_data %>%
   labs(title = "Age Distribution with Death Event")+
   scale_x_continuous(breaks = seq(40,100,10))
 
-# Boxplot of Age by Sex
-clean_data %>%
-  ggplot(aes(x = as.factor(sex), y = age)) + geom_boxplot(aes(fill = as.factor(sex))) +
-  labs(title = "Boxplot of Age by Sex") + xlab("Sex") + ylab("Age")
-
-```
-
-```{r}
+# Boxplot of Age by Death Event
 ggplot(clean_data, aes(x = DEATH_EVENT, y = age, fill = DEATH_EVENT)) +
   geom_boxplot() +
   labs(title = "Box Plot of Age by Death Event") +
@@ -116,8 +121,20 @@ ggplot(clean_data, aes(x = DEATH_EVENT, y = age, fill = DEATH_EVENT)) +
 
 ```
 
+### Age by Sex
+
+```{r}
+# Boxplot of Age by Sex
+clean_data %>%
+  ggplot(aes(x = as.factor(sex), y = age)) + geom_boxplot(aes(fill = as.factor(sex))) +
+  labs(title = "Boxplot of Age by Sex") + xlab("Sex") + ylab("Age")
+```
+
+# 4. Model Building
+
+## 4.1 Train / test splits
+
 ```{r Splitting data}
-# Data Prepocessing
 set.seed(123)
 train_index <- createDataPartition(clean_data$DEATH_EVENT, p = 0.8, list = FALSE)
 train_data <- clean_data[train_index, ]
@@ -125,6 +142,8 @@ test_data <- clean_data[-train_index, ]
 
 head(train_data)
 ```
+
+## 4.2 Best Predictors
 
 ```{r Strong predictors, message=FALSE, warning=FALSE}
 # Checking for strong predictors
@@ -135,7 +154,7 @@ print(important_features)
 ```
 
 
-## Models and Predictions
+## 4.3 Models and Predictions
 
 
 ### Decision Tree
@@ -251,6 +270,8 @@ confusionMatrix(pred, test_data$DEATH_EVENT)
 
 ```
 
+### Logistic Regression
+
 ```{r Training GLM}
 # Fit the logistic regression model
 glm_model <- caret::train(DEATH_EVENT ~ ., 
@@ -297,6 +318,7 @@ legend("bottomright", paste("AUC = ", round(auc, 3)), bty = "n", cex = 0.8)
 
 ```
 
+### Gradient Boost 
 
 ```{r Trining GRM}
 # Define the training control
@@ -333,6 +355,7 @@ acc_gbm <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$overall["Accu
 tpr_gbm <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$byClass["Specificity"]
 ```
 
+# 5. Performance Comparison
 
 ```{r Comparing performance}
 data.frame(algorithm = c("logistic\nregression", "decision\ntree", "random\nforest", "GBM"),
