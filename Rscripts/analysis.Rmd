@@ -1,95 +1,55 @@
 ---
-title: "Heart Failure Prediction"
-author: "Your Name"
-date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
-# Introduction
+# Setup
 
-This is an exploratory analysis of a heart failure dataset.
+## Setting the environment
 
-# Data Loading
-
-```{r}
-# Load required packages
-library(tidyverse)
-library(ggplot2)
+```{r Libraries, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
 library(caret)
-library(GGally)
-library(dplyr)
-
-
-# Read the dataset
-data <- read.csv("data/processed/cleaned_data.csv")
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+library(Boruta)
+library(ROCR)
+library(gbm)
+library(corrplot)
+library(stringr)
 ```
 
-# Data Cleaning
+## Data Cleaning
 
-## Convert Target Variable to Factor
-
-```{r}
-data$DEATH_EVENT <- as.factor(data$DEATH_EVENT)
+```{r N/A drop}
+# Source to the preprocessing script
+source("Rscripts/data_preprocessing.R")
 ```
 
-# Data Exploration
-
-## Summary Statistics
-
-```{r}
-summary(data)
+```{r Duplicates}
+# Checking for duplicates
+sum(duplicated(clean_data))
 ```
 
-## Correlation Analysis
-
-```{r}
-# Select only numeric variables for correlation
-numeric_data <- data[, sapply(data, is.numeric)]
-
-# Correlation matrix
-if (ncol(numeric_data) > 1) {
-  cor_matrix <- cor(numeric_data, method = "pearson")
-  print("Correlation Matrix:")
-  print(cor_matrix)
-  
-  # Visualize correlation matrix
-  library(corrplot)
-  corrplot(cor_matrix, method = "circle")
-} else {
-  print("Not enough numeric variables for a correlation matrix.")
-}
+```{r Death_event to factor}
+# Converting DEATH_EVENT into a factor
+clean_data$DEATH_EVENT <- factor(clean_data$DEATH_EVENT)
 ```
 
-## Univariate Plots
-
-### Age Distribution
-
-```{r}
-data %>%
-ggplot(aes(x = age)) + geom_histogram(binwidth = 5,
-color = "white", alpha = 0.5) +
-labs(title = "Age Distribution") + scale_x_continuous(breaks = seq(40, 100, 10))
+## Data exploration
+```{r Data structure}
+# Data exploration
+glimpse(clean_data)
 ```
 
-### Death Event by Age
-
-```{r}
-data %>%
-ggplot(aes(x = age, fill = DEATH_EVENT)) + geom_histogram(binwidth = 5,
-color = "white", alpha = 0.7) +
-labs(title = "Death Event by Age") + scale_x_continuous(breaks = seq(40, 100, 10))
+```{r Data summary}
+summary(clean_data)
 ```
 
-# Model Building
-
-## Logistic Regression
-
-
-
-
-
 ```{r}
-library(dplyr)
 # Select only numeric variables for correlation
 numeric_data <- clean_data[, sapply(clean_data, is.numeric)]
 
@@ -107,127 +67,289 @@ if (ncol(numeric_data) > 1) { # check if we have at least two numeric variables
 }
 ```
 
-
-```{r}
+```{r message=FALSE, warning=FALSE}
+# Scatterplot Matrix using ggplot2
+library(GGally)
+clean_data %>%
+  ggpairs(columns = c("age", "creatinine_phosphokinase", "ejection_fraction", "platelets", "serum_creatinine", "serum_sodium"),
+          mapping = ggplot2::aes(color = DEATH_EVENT)) +
+  ggplot2::theme_light()
 
 ```
 
-## Distribution of Age and Death Event
 
-```{r}
-library(ggplot2)
+```{r Exploration}
+# Age distribution Plots
 
-# Age distribution
+# Simple Age distribution
 clean_data %>%
   ggplot(aes(x = age)) + 
-  geom_histogram(binwidth = 5, color = "white", fill = "#0c4c8a", alpha = 0.7) +
-  labs(title = "Age Distribution") + 
-  scale_x_continuous(breaks = seq(40, 100, 10))
+  geom_histogram(binwidth = 5, 
+                 color = "white", 
+                 fill = "grey",
+                 alpha = 0.5) +
+  labs(title = "Age Distribution") +
+  scale_x_continuous(breaks = seq(40,100,10))
 
-# Death event by age
+# Age distribution against Death Event
+clean_data %>% 
+  ggplot(aes(x = age, fill = DEATH_EVENT)) +
+  geom_histogram(binwidth = 5, 
+                 position = "identity",
+                 alpha = 0.5,color = "white") +
+  scale_fill_manual(values = c("#999999", "#1F77B4")) +
+  labs(title = "Age Distribution with Death Event")+
+  scale_x_continuous(breaks = seq(40,100,10))
+
+# Boxplot of Age by Sex
 clean_data %>%
-  ggplot(aes(x = age, fill = as.factor(DEATH_EVENT))) + 
-  geom_histogram(binwidth = 5, position = "dodge", alpha = 0.7) +
-  labs(title = "Death Event by Age") +
-  scale_fill_manual(values = c("#0c4c8a", "#e63946"))
-```
-
-
-## Further Analysis
-
-### Logistic Regression
-Here you can add the code for logistic regression analysis.
-
-```{r}
-# Logistic Regression code here
-```
-
-### Tree-Based Models
-Here you can add the code for tree-based models like Decision Trees, Random Forest, etc.
-
-```{r}
-# Tree-Based Models code here
-```
-
-### Model Evaluation
-Discuss and evaluate the performance of the models here.
-
-```{r}
-# Model Evaluation code here
-```
-
-```{r}
-
-# Logistic Regression Analysis
-
-## Load required libraries
-library(tidyverse)
-library(caret)
-
-## Load the cleaned data
-clean_data <- read.csv("clean_data.csv")
-
-## Splitting the data into training and test sets
-set.seed(42)
-splitIndex <- createDataPartition(clean_data$DEATH_EVENT, p = .7, list = FALSE)
-train_data <- clean_data[splitIndex,]
-test_data  <- clean_data[-splitIndex,]
-
-## Model Fitting
-logistic_model <- glm(DEATH_EVENT ~ ., family = binomial(), data = train_data)
-
-## Summary of the model
-summary(logistic_model)
-
-## Predictions
-predictions <- predict(logistic_model, test_data, type = "response")
-
-## Evaluating the model
-roc_curve <- roc(test_data$DEATH_EVENT, predictions)
-auc(roc_curve)
-
-## Confusion Matrix
-predictions_binary <- ifelse(predictions > 0.5, 1, 0)
-conf_matrix <- confusionMatrix(as.factor(predictions_binary), as.factor(test_data$DEATH_EVENT))
-print(conf_matrix)
+  ggplot(aes(x = as.factor(sex), y = age)) + geom_boxplot(aes(fill = as.factor(sex))) +
+  labs(title = "Boxplot of Age by Sex") + xlab("Sex") + ylab("Age")
 
 ```
 
-## Logistic Regression
-
-### Model Fitting
-We'll fit a logistic regression model using all the features in the dataset. 
-
 ```{r}
+ggplot(clean_data, aes(x = DEATH_EVENT, y = age, fill = DEATH_EVENT)) +
+  geom_boxplot() +
+  labs(title = "Box Plot of Age by Death Event") +
+  scale_fill_brewer(palette = "Set1")
+
+```
+
+```{r Splitting data}
+# Data Prepocessing
+set.seed(123)
+train_index <- createDataPartition(clean_data$DEATH_EVENT, p = 0.8, list = FALSE)
+train_data <- clean_data[train_index, ]
+test_data <- clean_data[-train_index, ]
+
+head(train_data)
+```
+
+```{r Strong predictors, message=FALSE, warning=FALSE}
+# Checking for strong predictors
+boruta_model <- Boruta(DEATH_EVENT ~ ., data = train_data, doTrace = 2)
+
+important_features <- getSelectedAttributes(boruta_model)
+print(important_features)
+```
+
+
+## Models and Predictions
+
+
+### Decision Tree
+
+```{r Default DT training}
+# Build a decision tree using the training data
+tree_model <- rpart(DEATH_EVENT ~ ., data = train_data, method = "class")
+```
+
+```{r Default DT plotting}
+# Visualize the decision tree
+rpart.plot(tree_model, main = "Decision Tree for Heart Failure", box.palette = "RdBu")
+```
+
+```{r Default DT predictions}
+# Make predictions on the testing set
+pred <- predict(tree_model, newdata = test_data, type = "class")
+
+# Evaluate the performance of the model
+confusionMatrix(pred, test_data$DEATH_EVENT)
+```
+
+```{r Variables importance}
+# Print the variable importance
+varImp <- varImp(tree_model)
+varImp %>% 
+  arrange(desc(Overall)) %>% 
+  print()
+```
+
+
+```{r Featured selected DT}
+# Build a decision tree using the training data
+tree_feat <- rpart(DEATH_EVENT ~ age +
+                      ejection_fraction +
+                      serum_creatinine +
+                      time, 
+                    data = train_data, 
+                    method = "class")
+```
+
+```{r Pruning feat. DT}
+# Prune the decision tree to reduce overfitting
+model.pruned <- prune(tree_feat, cp = 0.01)
+
+```
+
+```{r Pllotting feat. DT}
+# Plot the pruned decision tree
+prp(model.pruned, extra = 101, box.col = "lightblue", branch.lty = 3)
+```
+
+```{r Feat. DT predictions}
+# Make predictions on the testing set
+predictions <- predict(model.pruned, newdata = test_data, type = "class")
+
+confusionMatrix(predictions, test_data$DEATH_EVENT)
+```
+
+```{r Storing metrics}
+acc_dt <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$overall["Accuracy"]
+tpr_dt <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$byClass["Specificity"]
+```
+
+
+### Random Forest
+
+```{r Training RF}
+# Train the random forest
+rf_model <- randomForest(DEATH_EVENT ~ ., data = train_data, ntree = 500, mtry = 3)
+
+
+# Make predictions on the testing set
+pred <- predict(rf_model, newdata = test_data)
+
+# Evaluate the performance of the model
+confusionMatrix(pred, test_data$DEATH_EVENT)
+```
+
+```{r Saving Metrics}
+acc_rf <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$overall["Accuracy"]
+tpr_rf <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$byClass["Specificity"]
+```
+
+
+```{r RF variable importance}
+# Create variable importance plot
+varImpPlot(rf_model, type = 2, main = "Variable Importance Plot for Random Forest")
+
+```
+
+```{r RF plot}
+plot(rf_model)
+```
+
+```{r Tuned RF}
+# Train the random forest
+rf_model <- randomForest(DEATH_EVENT ~ time + 
+                           ejection_fraction + 
+                           serum_creatinine + 
+                           age +
+                           creatinine_phosphokinase, 
+                         data = train_data, 
+                         ntree = 250, 
+                         mtry = 2)
+
+
+# Make predictions on the testing set
+pred <- predict(rf_model, newdata = test_data)
+
+# Evaluate the performance of the model
+confusionMatrix(pred, test_data$DEATH_EVENT)
+
+```
+
+```{r Training GLM}
 # Fit the logistic regression model
-logistic_model <- glm(DEATH_EVENT ~ ., family = binomial(), data = train_data)
+glm_model <- caret::train(DEATH_EVENT ~ ., 
+                          data = train_data, 
+                          method = "glm", 
+                          trControl = trainControl(method = "cv", number = 10))
+
+pred <- predict(glm_model, newdata = test_data)
+confusionMatrix(pred, test_data$DEATH_EVENT)
 ```
 
-### Model Summary
-After fitting, we can check the summary of the model to interpret the coefficients and assess the significance of each feature.
-
-```{r}
-# Display the summary of the logistic regression model
-summary(logistic_model)
+```{r Saving GLM metrics}
+acc_glm <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$overall["Accuracy"]
+tpr_glm <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$byClass["Specificity"]
 ```
 
-### Model Evaluation
-We can use metrics like accuracy, confusion matrix, and ROC curve to evaluate the model.
 
-```{r}
-# Predict on the test set
-predictions <- predict(logistic_model, newdata = test_data, type = "response")
+```{r GLM predictions}
+# Predict the outcome probabilities for the test set
+pred <- predict(glm_model, newdata = test_data, type = "prob")
 
-# Convert probabilities to binary outcomes
-predicted_labels <- ifelse(predictions > 0.5, 1, 0)
+# Create the prediction object for performance analysis
+pred_obj <- prediction(pred[, 2], test_data$DEATH_EVENT)
 
-# Confusion Matrix
-cm <- confusionMatrix(as.factor(predicted_labels), as.factor(test_data$DEATH_EVENT))
-cm
+# Calculate TPR and FPR values at various thresholds
+perf_obj <- ROCR::performance(pred_obj, measure = "tpr", x.measure = "fpr")
 ```
 
-```{r}
-# ROC Curve
-roc_curve <- roc(test_data$DEATH_EVENT, predictions)
-roc_curve
+
+```{r GLM - ROC}
+# Plot the ROC curve
+plot(perf_obj, main = "ROC Curve for Logistic Regression Model", 
+     xlab = "False Positive Rate", ylab = "True Positive Rate", colorize=T, lwd = 2)
+
+# Add a diagonal reference line
+abline(a = 0, b = 1, lwd = 1.5, col = "gray")
+
+# Calculate the area under the ROC curve
+auc <- ROCR::performance(pred_obj, "auc")
+auc <- auc@y.values[[1]]
+
+# Add the AUC value to the plot
+legend("bottomright", paste("AUC = ", round(auc, 3)), bty = "n", cex = 0.8)
+
 ```
+
+
+```{r Trining GRM}
+# Define the training control
+ctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+
+# Train the GBM model using cross-validation
+gbm_model <- caret::train(DEATH_EVENT ~ ., 
+                   data = train_data, 
+                   method = "gbm",
+                   trControl = ctrl,
+                   verbose = FALSE)
+
+# Make predictions on the testing set
+pred <- predict(gbm_model, newdata = test_data)
+
+# Evaluate the performance of the model
+confusionMatrix(pred, test_data$DEATH_EVENT)
+```
+
+```{r GBM variable importance}
+# Plot feature importance
+gbm_imp <- varImp(gbm_model, scale = FALSE)
+ggplot(gbm_imp, aes(x = Reorder(row.names(gbm_imp), gbm_imp$Overall),
+                    y = Overall, fill = Overall)) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  labs(x = "Feature", y = "Importance", title = "Variable Importance") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+```{r Saving GBM metrics}
+acc_gbm <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$overall["Accuracy"]
+tpr_gbm <- confusionMatrix(pred, as.factor(test_data$DEATH_EVENT))$byClass["Specificity"]
+```
+
+
+```{r Comparing performance}
+data.frame(algorithm = c("logistic\nregression", "decision\ntree", "random\nforest", "GBM"),
+           accuracy = c(acc_glm, acc_dt, acc_rf, acc_gbm)*100,
+           recall = c(tpr_glm, tpr_dt, tpr_rf, tpr_gbm)*100) %>%
+  pivot_longer(col = -algorithm, names_to = "metrics", values_to = "percent") %>%
+  ggplot(aes(x = reorder(algorithm, X = percent),
+             y = percent,
+             fill = metrics)) +
+    geom_bar(stat = "identity",
+             position = "dodge",
+             alpha=0.9) +
+    geom_text(aes(group = metrics, label = str_c(sprintf("%2.1f", percent), "%")), 
+              position = position_dodge(width = 0.9), vjust = -0.2) +
+    scale_fill_manual(values = c("#1F77B4", "#999999")) +
+    labs(x = "algorithm", title = "Metrics of different classifier models") +
+    theme_minimal(base_size = 12)
+
+```
+
