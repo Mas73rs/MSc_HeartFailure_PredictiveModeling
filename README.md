@@ -10,7 +10,7 @@ The goals of this research are twofold: to create a reliable survival prediction
 
 * `age` : Age of the patient in years
 * `anaemia` : Decrease of red blood cells or hemoglobin (haematocrit levels were lower than 36%)
-* `creatinine_phosphokinase` : Level of the CPK enzyme in the blood mcg/L (23, ..., 7861)
+* `creatinine_phosphokinase` : Level of the CPK enzyme in the blood mcg/L
 * `diabetes` : If the patient has diabetes (Boolean) 
 * `ejection_fraction` : Percentage of blood leaving the heart at each contraction
 * `high_blood_pressure` : If a patient has hypertension (Boolean) 
