@@ -100,7 +100,7 @@ This section would typically include reflections on what was learned throughout 
 
 ![GBM Importance](results/GBM_feature_importance.png)
 
-*The feature importance graphs for both the Gradient Boosting Machine and Random Forest models indicate the variables that are most influential in predicting heart failure. Features like 'Serum Creatinine' and 'Ejection Fraction' consistently show high importance, validating their role in the diagnostic process.*
+*The feature importance graphs for both the Gradient Random Forest and Boosting Machine models, respectively, indicate the variables that are most influential in predicting heart failure. Features like 'Serum Creatinine' and 'Ejection Fraction' consistently show high importance, validating their role in the diagnostic process.*
 
 ### Metrics Consideration 
 One of the crucial learnings from this study is the importance of evaluation metrics like Sensitivity in medical diagnosis tasks. While accuracy is a commonly used metric, it may not be sufficient for tasks with a high cost of False Negatives.
