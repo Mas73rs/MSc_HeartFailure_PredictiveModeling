@@ -77,7 +77,7 @@ The study employed four machine learning algorithms: Decision Tree, Random Fores
 ### Importance of Metrics 
 In a medical diagnosis task like predicting heart failure, Sensitivity is often the most critical metric. Capturing as many positive cases (patients with heart failure) as possible is crucial to prevent adverse outcomes.
 
-Essential factors in predicting risk in heart failure patients were also identified, including Serum Creatinine, Ejection Fraction, time, and age. Medical professionals could utilise these factors for better patient outcomes.
+Essential factors in predicting risk in heart failure patients were also identified, including `Serum Creatinine`, `Ejection Fraction`, `time`, and `age`. Medical professionals could utilise these factors for better patient outcomes.
 
 
 ## Learning Reflections
