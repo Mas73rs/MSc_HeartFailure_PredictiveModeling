@@ -44,7 +44,14 @@ We used a dataset of 299 heart failure patients' medical records retrieved from 
 * `smoking` : If the patient smokes (Boolean) 
 * `time` : Follow-up period
 * `DEATH_EVENT` : If the patient died during the follow-up period (Boolean)
+  
 
+![Age Distribution](results/Age_dist_target.png)
+*This graph presents the age distribution of patients categorized by the target variable. It provides an insight into the age groups that are more susceptible to heart failure. The distribution indicates that older age groups appear to be at a higher risk, reinforcing the importance of age as a feature in our predictive models.*
+
+
+![Features correlation](results/corr_.png)
+*The correlation plots illustrate how different features are correlated with each other. Strong correlations between features  indicate potential multicollinearity, which was considered during the feature selection process.*
 
 ### Algorithms Used
 The following machine-learning algorithms have been employed in this study:
@@ -70,6 +77,10 @@ Further stages of the methodology include data preprocessing, exploratory data a
 
 The study employed four machine learning algorithms: Decision Tree, Random Forest, Logistic Regression, and Gradient Boosting Machine. According to our findings, the Random Forest algorithm emerged as the most effective, achieving:
 
+![Model Comparison](results/model_comparison.png)
+*This graph compares the performance metrics of all the models tested in this study. The Random Forest model stands out for its balanced performance across multiple metrics, thereby making it the most reliable model for this specific task.*
+
+
 - **Accuracy**: 91.53%
 - **Sensitivity**: 97.5%
 - **Specificity**: 78.95%
@@ -83,6 +94,13 @@ Essential factors in predicting risk in heart failure patients were also identif
 ## Learning Reflections
 
 This section would typically include reflections on what was learned throughout the research process, from comparing machine learning algorithms to the importance of evaluation metrics.
+
+![Random Forest](results/rf_feature_importance.png)
+
+
+![Alt text](results/GBM_feature_importance.png)
+
+*The feature importance graphs for both the Gradient Boosting Machine and Random Forest models indicate the variables that are most influential in predicting heart failure. Features like 'Serum Creatinine' and 'Ejection Fraction' consistently show high importance, validating their role in the diagnostic process.*
 
 ### Metrics Consideration 
 One of the crucial learnings from this study is the importance of evaluation metrics like Sensitivity in medical diagnosis tasks. While accuracy is a commonly used metric, it may not be sufficient for tasks with a high cost of False Negatives.
