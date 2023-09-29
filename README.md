@@ -77,13 +77,13 @@ Further stages of the methodology include data preprocessing, exploratory data a
 
 The study employed four machine learning algorithms: Decision Tree, Random Forest, Logistic Regression, and Gradient Boosting Machine. According to our findings, the Random Forest algorithm emerged as the most effective, achieving:
 
-![Model Comparison](results/model_comparison.png)
-*This graph compares the performance metrics of all the models tested in this study. The Random Forest model stands out for its balanced performance across multiple metrics, thereby making it the most reliable model for this specific task.*
-
-
 - **Accuracy**: 91.53%
 - **Sensitivity**: 97.5%
 - **Specificity**: 78.95%
+
+
+![Model Comparison](results/model_comparison.png)
+*This graph compares the performance metrics of all the models tested in this study. The Random Forest model stands out for its balanced performance across multiple metrics, thereby making it the most reliable model for this specific task.*
 
 ### Importance of Metrics 
 In a medical diagnosis task like predicting heart failure, Sensitivity is often the most critical metric. Capturing as many positive cases (patients with heart failure) as possible is crucial to prevent adverse outcomes.
@@ -98,7 +98,7 @@ This section would typically include reflections on what was learned throughout 
 ![Random Forest](results/rf_feature_importance.png)
 
 
-![Alt text](results/GBM_feature_importance.png)
+![GBM Importance](results/GBM_feature_importance.png)
 
 *The feature importance graphs for both the Gradient Boosting Machine and Random Forest models indicate the variables that are most influential in predicting heart failure. Features like 'Serum Creatinine' and 'Ejection Fraction' consistently show high importance, validating their role in the diagnostic process.*
 
